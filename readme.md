@@ -1,3 +1,3 @@
-MY GAME: NOCOM
+MY PROJECT: NOCOM
 
 BY: Loras
