@@ -24,6 +24,14 @@ void cell::set_y(const UI32 __y) { _y = __y; }
 
 #pragma endregion
 
+#pragma region Map_Node_Area
+map_node::map_node(const map __map) : _map(__map) {}
+map_node * map_node::get_top() { return _adjacents[0]; }
+map_node * map_node::get_right() { return _adjacents[1]; }
+map_node * map_node::get_down() { return _adjacents[2]; }
+map_node * map_node::get_left() { return _adjacents[3]; }
+#pragma endregion
+
 #pragma region Map_Area
 
 map::map(const UI32 __width, const UI32 __height)

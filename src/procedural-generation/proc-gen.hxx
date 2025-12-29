@@ -38,8 +38,13 @@ namespace proc_gen {
     };
     
     class map_node {
-        map_node * adjacents = { nullptr };
+        map _map;
+        map_node * _adjacents[4];
     public:
+        map_node(const map __map);
         map_node * get_top();
+        map_node * get_down();
+        map_node * get_right();
+        map_node * get_left();
     };
 }
