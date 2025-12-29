@@ -4,8 +4,7 @@ using namespace proc_gen;
 
 #pragma region Cell_Area
 
-cell::cell(const char __rep, const UI32 __x, const UI32 __y)
-: _x(__x), _y(__y)
+cell::cell(const char __rep)
 {
     switch (__rep) {
         case '.': _type = cell_type::EMPTY; break;
@@ -16,16 +15,11 @@ cell::cell(const char __rep, const UI32 __x, const UI32 __y)
 cell_type cell::type() const { return _type; }
 void cell::set_type(const cell_type __type) { _type = __type; }
 
-UI32 cell::x() const { return _x; }
-void cell::set_x(const UI32 __x) { _x = __x; }
-
-UI32 cell::y() const { return _y; }
-void cell::set_y(const UI32 __y) { _y = __y; }
-
 #pragma endregion
 
 #pragma region Map_Node_Area
 map_node::map_node(const map __map) : _map(__map) {}
+map_node ** map_node::adjacents() { return _adjacents; }
 map_node * map_node::get_top() { return _adjacents[0]; }
 map_node * map_node::get_right() { return _adjacents[1]; }
 map_node * map_node::get_down() { return _adjacents[2]; }

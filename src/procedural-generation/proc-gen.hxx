@@ -13,19 +13,10 @@ namespace proc_gen {
     class cell {
         cell_type _type;
         char _rep;
-        UI32 _x;
-        UI32 _y;
     public:
-        cell(const char __rep, const UI32 __x, const UI32 __y);
-        
+        cell(const char __rep);
         cell_type type() const;
         void set_type(const cell_type __type);
-
-        UI32 x() const;
-        void set_x(const UI32 __x);
-
-        UI32 y() const;
-        void set_y(const UI32 __y);
     };
     
     class map {
@@ -33,6 +24,11 @@ namespace proc_gen {
         UI32 _width;
         UI32 _height;
     public:
+        static const UI32 MAP_MAX_WIDTH = 50;
+        static const UI32 MAP_MAX_HEIGHT = 50;
+        static const UI32 MAP_MIN_WIDTH = 15;
+        static const UI32 MAP_MIN_HEIGHT = 15;
+
         map(const UI32 __width, const UI32 __height);
         std::vector<std::vector<cell>> matrix() const;
     };
@@ -42,9 +38,18 @@ namespace proc_gen {
         map_node * _adjacents[4];
     public:
         map_node(const map __map);
+        map_node ** adjacents();
         map_node * get_top();
-        map_node * get_down();
         map_node * get_right();
+        map_node * get_down();
         map_node * get_left();
     };
+
+    void generate_rooms(const UI32 total_rooms) {
+        for (int i = 0; i < total_rooms; i++) {
+
+        }
+    }
+
+    void new_adjacent(map_node * node);
 }
