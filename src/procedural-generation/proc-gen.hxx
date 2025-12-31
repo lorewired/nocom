@@ -82,10 +82,9 @@ namespace procedural_generation {
     void create_room_path(std::shared_ptr<map_node> room);
 
     void drunkards_walk_dfs();
-    void drunkards_walk_bfs();
     
     // debug
-    void debug_map(std::shared_ptr<map_node> root) {
+    inline void debug_map(std::shared_ptr<map_node> root) {
         using namespace std;
         auto cur = root;
         char c = ' ';
@@ -114,7 +113,7 @@ namespace procedural_generation {
         }
     }
 
-    void debug_map2(std::shared_ptr<map_node> root) {
+    inline void debug_map2(std::shared_ptr<map_node> root) {
         using namespace std;
         I32 N = 100;
         vector<vector<bool>> vis(N / 2, vector<bool>(N));

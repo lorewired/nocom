@@ -72,58 +72,6 @@ void procedural_generation::drunkards_walk_dfs() {
     }
 }
 
-void procedural_generation::drunkards_walk_bfs() {
-    const UI32 N = 50;
-    const UI32 M = 200;
-    const std::vector<I32> x_coords = { -1, 0, 1, 0 };
-    const std::vector<I32> y_coords = { 0, 1, 0, -1 };
-    const UI32 required_empty_cells = 1000;
-    const UI32 total_adjacents = 3;
-    UI32 empty_cells = 0;
-    std::vector<char> grid(N * M, ' ');
-
-    auto e = [&N, &M, &grid] (I32 i, I32 j) { return i >= 0 && j >= 0 && i < N && j < M && grid[i * M + j] != 'X'; };
-
-    std::queue<std::pair<I32, I32>> q;
-    const I32 x_s = r32ir(0, N - 1);
-    const I32 y_s = r32ir(0, M - 1);
-    q.emplace(x_s, y_s);
-
-    while (q.size()) {
-        auto [i, j] = q.front(); q.pop();
-
-        if (empty_cells == required_empty_cells) continue;
-        
-        std::vector<std::pair<I32, I32>> valid_coords;
-        for (I32 k = 0; k < 4; k++) {
-            I32 I = i + x_coords[k];
-            I32 J = j + y_coords[k];
-            if (e(I, J))
-                valid_coords.emplace_back(I, J);
-        }
-
-        if (valid_coords.empty()) continue;
-
-        UI32 adj = 0;
-        while (empty_cells < required_empty_cells && valid_coords.size() && adj < total_adjacents) {
-            I32 rdn_coord = r32ir(0, valid_coords.size() - 1);
-            auto [I, J] = valid_coords[rdn_coord];
-            grid[I * M + J] = 'X';
-            q.emplace(I, J);
-            valid_coords.erase(valid_coords.begin() + rdn_coord);
-            empty_cells ++;
-        }
-    }
-    
-    std::cout << "empty cells: " << empty_cells << '\n';
-
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < M; j++)
-            std::cout << grid[i * M + j];
-        std::cout << '\n';
-    }
-}
-
 void procedural_generation::create_room_path(std::shared_ptr<map_node> room) {
     const map room_map = room->get_map();
     const UI32 size = room_map.width() * room_map.height();
