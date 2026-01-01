@@ -1,117 +1,134 @@
 #include "proc-gen.hxx"
 
-using namespace procedural_generation;
+using namespace ProceduralGeneration;
 
-void procedural_generation::connect_rooms(
-    std::shared_ptr<map_node> src,
-    std::shared_ptr<map_node> dst,
-    node_dir dir
+void ProceduralGeneration::ConnectRooms(
+    std::shared_ptr<MapNode> src,
+    std::shared_ptr<MapNode> dst,
+    NodeDir dir
 )
 {
     // bidirectional connection
     switch (dir) {
         case TOP:
-            src->set_adjacent(TOP, dst);
-            dst->set_adjacent(DOWN, src);
+            src->SetAdjacent(TOP, dst);
+            dst->SetAdjacent(DOWN, src);
             break;
         case RIGHT:
-            src->set_adjacent(RIGHT, dst);
-            dst->set_adjacent(LEFT, src);
+            src->SetAdjacent(RIGHT, dst);
+            dst->SetAdjacent(LEFT, src);
             break;
         case DOWN:
-            src->set_adjacent(DOWN, dst);
-            dst->set_adjacent(TOP, src);
+            src->SetAdjacent(DOWN, dst);
+            dst->SetAdjacent(TOP, src);
             break;
         case LEFT:
-            src->set_adjacent(LEFT, dst);
-            dst->set_adjacent(RIGHT, src);
+            src->SetAdjacent(LEFT, dst);
+            dst->SetAdjacent(RIGHT, src);
     }
 }
 
-void procedural_generation::drunkards_walk_dfs() {
-    const UI32 N = 50;
-    const UI32 M = 200;
-    const std::vector<I32> x_coords = { -1, 0, 1, 0 };
-    const std::vector<I32> y_coords = { 0, 1, 0, -1 };
-    std::vector<char> grid(N * M, ' ');
+void ProceduralGeneration::SetEmptyCells(Map& map) {
+    const int height = map.Height();
+    const int width = map.Width();
+    const int totalBorderCells = (height << 1) + (width << 1);
+    const int totalEmptyArea   = height * width - totalBorderCells;
+    const int xCoords[]        = { -1, 0, 1, 0 };
+    const int yCoords[]        = { 0, 1, 0, -1 };
 
-    auto e = [&N, &M] (I32 i, I32 j) { return i >= 0 && j >= 0 && i < N && j < M; };
+    auto valid = [&height, &width] (int i, int j) { return i > 0 && j > 0 && i < height - 1 && j < width - 1; };
     
-    const UI32 required_empty_cells = 200;
-    UI32 empty_cells = 0;
+    int randomPercent      = r32ir(60, 90);
+    int requiredEmptyCells = totalEmptyArea * randomPercent / 100;
+    int emptyCells         = 0;
 
-    std::stack<std::pair<I32, I32>> stk;
-    const I32 start_x = r32ir(0, N - 1);
-    const I32 start_y = r32ir(0, M - 1);
-    stk.emplace(start_x, start_y);
+    std::stack<std::pair<int, int>> stk;
+    const int startX = r32ir(1, height - 2);
+    const int startY = r32ir(1, width - 2);
+    stk.emplace(startX, startY);
 
+    int min_x, min_y;
+    int max_x, max_y;
+
+    min_x = max_x = startX;
+    min_y = max_y = startY;
+    
     while (stk.size()) {
         auto [i, j] = stk.top(); stk.pop();
-        if (empty_cells == required_empty_cells) continue;
-        if (grid[i * M + j] != 'X') {
-            grid[i * M + j] = 'X';
-            empty_cells ++;
+
+        if (emptyCells == requiredEmptyCells)
+            continue;
+
+        min_x = std::min(min_x, i);
+        max_x = std::max(max_x, i);
+        min_y = std::min(min_y, j);
+        max_y = std::max(max_y, j);
+
+        if (map.At(i, j).Type() != CellType::EMPTY) {
+            map.At(i, j).SetType(CellType::EMPTY);
+            emptyCells ++;
         }
-        std::vector<std::pair<I32, I32>> valid_coords;
-        for (I32 k = 0; k < 4; k++) {
-            I32 I = i + x_coords[k];
-            I32 J = j + y_coords[k];
-            if (e(I, J))
-                valid_coords.emplace_back(I, J);
+
+        std::vector<std::pair<int, int>> validCoords;
+        for (int k = 0; k < 4; k++) {
+            int I = i + xCoords[k];
+            int J = j + yCoords[k];
+            if (valid(I, J))
+                validCoords.emplace_back(I, J);
         }
-        I32 rdn_coord = r32ir(0, valid_coords.size() - 1);
-        auto [I, J] = valid_coords[rdn_coord];
-        stk.emplace(I, J);
+        
+        std::shuffle(validCoords.begin(), validCoords.end(), GetRandomGenerator());
+        
+        for (const auto& coord : validCoords)
+            stk.push(coord);
     }
 
-    std::cout << "empty cells: " << empty_cells << '\n';
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < M; j++)
-            std::cout << grid[i * M + j];
-        std::cout << '\n';
-    }
+    max_x ++, max_y ++; // moving to adjacent full cell
+    min_x --, min_y --; // "
+
+    const int new_height = max_x - min_x + 1;
+    const int new_width  = max_y - min_y + 1;
+    Map new_map(new_width, new_height);
+
+    for (int i = 0; i < new_height; i++)
+        for (int j = 0; j < new_width; j++)
+            new_map.At(i, j) = map.At(i + min_x, j + min_y);
+
+    map = new_map;
 }
 
-void procedural_generation::create_room_path(std::shared_ptr<map_node> room) {
-    const map room_map = room->get_map();
-    const UI32 size = room_map.width() * room_map.height();
-    std::vector<I32> weights(size);
-    std::vector<I32> distance(size, 1e9);
-    // defining random weights to all cells
-    for (int i = 0; i < size; i++)
-        weights[i] = r32ir(1, I32(1e9) >> 1);
-    // find the shortest path
-    std::priority_queue<std::tuple<I32, UI32, UI32>> pq;
-}
-
-std::shared_ptr<map_node> procedural_generation::generate_rooms(UI32 total_rooms) {
-    std::vector<std::shared_ptr<map_node>> rooms;
-    UI32 rooms_created = 0;
-    while (rooms_created < total_rooms) {
-        if (!rooms_created) {
-            rooms.push_back(std::make_shared<map_node>(create_map_node()));
-            rooms_created ++;
+std::shared_ptr<MapNode> ProceduralGeneration::GenerateRooms(const int totalRooms) {
+    std::vector<std::shared_ptr<MapNode>> rooms;
+    int roomsCreated = 0;
+    while (roomsCreated < totalRooms) {
+        if (!roomsCreated) {
+            rooms.push_back(std::make_shared<MapNode>(CreateMapNode()));
+            roomsCreated ++;
             continue;
         }
+
+        int randomRoom  = r32ir(0, int(rooms.size() - 1));
+        auto targetRoom = rooms[randomRoom];
         
-        I32 rdn_room_idx = r32ir(0, I32(rooms.size() - 1));
-        node_dir rdn_connection_dir = map_node::rdn_node_dir();
-        auto target_room = rooms[rdn_room_idx];
+        NodeDir randomDir = MapNode::RandomNodeDirection();
         
-        if (target_room->get_adjacent(rdn_connection_dir) != nullptr)
+        if (targetRoom->GetAdjacent(randomDir) != nullptr)
             continue;
             
-        auto new_room = std::make_shared<map_node>(create_map_node());
-        connect_rooms(target_room, new_room, rdn_connection_dir);
-        rooms.push_back(new_room);
-        rooms_created ++;
+        auto newRoom = std::make_shared<MapNode>(CreateMapNode());
+        ConnectRooms(targetRoom, newRoom, randomDir);
+
+        rooms.push_back(newRoom);
+        roomsCreated ++;
     }
     // Pick a random room to be the root
-    return rooms[r32ir(0, I32(rooms.size() - 1))];
+    return rooms[r32ir(0, int(rooms.size() - 1))];
 }
 
-map_node procedural_generation::create_map_node() {
-    I32 width = r32ir(map::MAP_MIN_HEIGHT, map::MAP_MAX_HEIGHT);
-    I32 height = r32ir(map::MAP_MIN_HEIGHT, width);
-    return map_node(map(width, height));
+MapNode ProceduralGeneration::CreateMapNode() {
+    int height = r32ir(Map::MAP_MIN_HEIGHT, Map::MAP_MAX_HEIGHT);
+    int width  = r32ir(height, Map::MAP_MAX_WIDTH);
+    Map newMap = Map(width, height);
+    SetEmptyCells(newMap);
+    return MapNode(newMap);
 }
