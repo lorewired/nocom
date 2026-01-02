@@ -38,13 +38,13 @@ void Game::ProceduralGeneration::SetEmptyCells(Entities::Map& map) {
 
     auto valid = [&height, &width] (int i, int j) { return i > 0 && j > 0 && i < height - 1 && j < width - 1; };
     
-    int randomPercent      = r32ir(60, 90);
+    int randomPercent      = Game::Utils::r32ir(60, 90);
     int requiredEmptyCells = totalEmptyArea * randomPercent / 100;
     int emptyCells         = 0;
 
     std::stack<std::pair<int, int>> stk;
-    const int startX = r32ir(1, height - 2);
-    const int startY = r32ir(1, width - 2);
+    const int startX = Game::Utils::r32ir(1, height - 2);
+    const int startY = Game::Utils::r32ir(1, width - 2);
     stk.emplace(startX, startY);
 
     int min_x, min_y;
@@ -77,7 +77,11 @@ void Game::ProceduralGeneration::SetEmptyCells(Entities::Map& map) {
                 validCoords.emplace_back(I, J);
         }
         
-        std::shuffle(validCoords.begin(), validCoords.end(), GetRandomGenerator());
+        std::shuffle(
+            validCoords.begin(),
+            validCoords.end(),
+            Game::Utils::GetRandomGenerator()
+        );
         
         for (const auto& coord : validCoords)
             stk.push(coord);
@@ -107,7 +111,7 @@ std::shared_ptr<MapNode> Game::ProceduralGeneration::GenerateRooms(const int tot
             continue;
         }
 
-        int randomRoom  = r32ir(0, int(rooms.size() - 1));
+        int randomRoom  = Game::Utils::r32ir(0, int(rooms.size() - 1));
         auto targetRoom = rooms[randomRoom];
         
         NodeDir randomDir = MapNode::RandomNodeDirection();
@@ -122,12 +126,12 @@ std::shared_ptr<MapNode> Game::ProceduralGeneration::GenerateRooms(const int tot
         roomsCreated ++;
     }
     // Pick a random room to be the root
-    return rooms[r32ir(0, int(rooms.size() - 1))];
+    return rooms[Game::Utils::r32ir(0, int(rooms.size() - 1))];
 }
 
 MapNode Game::ProceduralGeneration::CreateMapNode() {
-    int height = r32ir(Entities::Map::MAP_MIN_HEIGHT, Entities::Map::MAP_MAX_HEIGHT);
-    int width  = r32ir(height, Entities::Map::MAP_MAX_WIDTH);
+    int height = Game::Utils::r32ir(Entities::Map::MAP_MIN_HEIGHT, Entities::Map::MAP_MAX_HEIGHT);
+    int width  = Game::Utils::r32ir(height, Entities::Map::MAP_MAX_WIDTH);
     Entities::Map newMap = Entities::Map(width, height);
     SetEmptyCells(newMap);
     return MapNode(newMap);
