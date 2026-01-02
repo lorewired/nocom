@@ -21,13 +21,13 @@ namespace ProceduralGeneration {
     enum class CellType {
         EMPTY,
         WALL,
-        CHEST
+        DOOR,
     };
 
     inline std::map<CellType, char> Glyph = {
-        {CellType::EMPTY, '.'},
-        {CellType::WALL, '#'},
-        {CellType::CHEST, 'B'},
+        { CellType::EMPTY, '.' },
+        { CellType::WALL,  '#' },
+        { CellType::DOOR,  '$' },
     };
 
     class Cell {
@@ -94,7 +94,8 @@ namespace ProceduralGeneration {
         int Number() const;
         
         std::shared_ptr<MapNode> GetAdjacent(NodeDir dir);
-        void SetAdjacent(NodeDir dir, std::shared_ptr<MapNode> node);
+        void SetAdjacent(NodeDir dir, std::shared_ptr<MapNode> other);
+        void SetEntrances(NodeDir dir, std::shared_ptr<MapNode> other);
         
         static NodeDir RandomNodeDirection();
     };
