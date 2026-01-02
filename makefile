@@ -6,7 +6,8 @@ TARGET  := dungeon_gen.exe
 
 SRCS    := cmd/main.cc \
            src/procedural-generation/proc-gen.cc \
-           src/procedural-generation/proc-gen-entities.cc
+           src/procedural-generation/proc-gen-entities.cc \
+           src/entities/map.cc
 
 OBJS    := $(SRCS:.cc=.o)
 
