@@ -39,7 +39,7 @@ if (other == nullptr) return;
                     cellsCoords.emplace_back(i, 0);
     }
 
-    auto [randomX, randomY] = cellsCoords[r32ir(0, cellsCoords.size() - 1)];
+    auto [randomX, randomY] = cellsCoords[Game::Utils::r32ir(0, cellsCoords.size() - 1)];
     map.At(randomX, randomY).SetType(Game::Entities::CellType::DOOR);
 }
 
@@ -54,7 +54,7 @@ std::shared_ptr<MapNode> MapNode::GetAdjacent(NodeDir dir) {
 }
 
 NodeDir MapNode::RandomNodeDirection() {
-    int randomDir = r32ir(0, 3);
+    int randomDir = Game::Utils::r32ir(0, 3);
     switch (randomDir) {
         case 0: return TOP;
         case 1: return RIGHT;
