@@ -1,12 +1,10 @@
 #pragma once
 
 #include "../utils/rand.hh"
+#include "../entities/map.hh"
 
 #include <vector>
-#include <map>
-#include <queue>
 #include <stack>
-#include <tuple>
 
 #include <algorithm>
 #include <utility>
@@ -15,65 +13,8 @@
 // for debug
 #include <iostream>
 
-namespace ProceduralGeneration {
+namespace Game::ProceduralGeneration {
     inline int ID = 0;
-
-    enum class CellType {
-        EMPTY,
-        WALL,
-        DOOR,
-    };
-
-    inline std::map<CellType, char> Glyph = {
-        { CellType::EMPTY, '.' },
-        { CellType::WALL,  '#' },
-        { CellType::DOOR,  '$' },
-    };
-
-    class Cell {
-        CellType type;
-        char rep;
-
-    public:
-        Cell() : type(CellType::WALL), rep(Glyph[CellType::WALL]) {}
-        Cell& operator= (const Cell& other) {
-            if (this == &other) return *this;
-            type = other.Type();
-            rep  = other.Rep();
-            return *this;
-        }
-        char Rep() const;
-        CellType Type() const;
-        void SetType(CellType type);
-    };
-
-    class Map {
-        std::vector<Cell> grid;
-        int width;
-        int height;
-
-    public:
-        static const int MAP_MAX_WIDTH = 50;
-        static const int MAP_MAX_HEIGHT = 20;
-        static const int MAP_MIN_WIDTH = 35;
-        static const int MAP_MIN_HEIGHT = 15;
-
-        Map(const int width, const int height);
-
-        Map& operator= (const Map& other) {
-            if (this == &other) return *this;
-            width  = other.Width();
-            height = other.Height();
-            grid   = other.Data();
-            return *this;
-        }
-
-        int Width() const;
-        int Height() const;
-
-        Cell &At(int x, int y);
-        const std::vector<Cell> &Data() const;
-    };
 
     enum NodeDir {
         TOP = 0,
@@ -83,14 +24,14 @@ namespace ProceduralGeneration {
     };
 
     class MapNode {
-        Map map;
+        Game::Entities::Map map;
         int number;
         std::shared_ptr<MapNode> adjacents[4];
 
     public:
-        MapNode(Map map);
+        MapNode(Game::Entities::Map map);
 
-        Map& GetMap();
+        Game::Entities::Map& GetMap();
         int Number() const;
         
         std::shared_ptr<MapNode> GetAdjacent(NodeDir dir);
@@ -104,7 +45,7 @@ namespace ProceduralGeneration {
 
     std::shared_ptr<MapNode> GenerateRooms(int total_rooms);
     void ConnectRooms(std::shared_ptr<MapNode> room1, std::shared_ptr<MapNode> room2, NodeDir dir);
-    void SetEmptyCells(Map& map);
+    void SetEmptyCells(Game::Entities::Map& map);
     
     // debug
     inline void DebugMap(std::shared_ptr<MapNode> root) {
@@ -137,28 +78,4 @@ namespace ProceduralGeneration {
         }
     }
 
-    inline void DebugMap2(std::shared_ptr<MapNode> root) {
-        using namespace std;
-        int N = 100;
-        vector<vector<bool>> vis(N / 2, vector<bool>(N));
-        auto traverse = [&](auto &&traverse, int i, int j, shared_ptr<MapNode> cur) -> void {
-            if (i < 0 || j < 0 || i == N / 2 || j == N || vis[i][j] || cur == nullptr)
-                return;
-            vis[i][j] = true;
-            if (cur->GetAdjacent(TOP) != nullptr)
-                traverse(traverse, i - 1, j, cur->GetAdjacent(TOP));
-            if (cur->GetAdjacent(RIGHT) != nullptr)
-                traverse(traverse, i, j + 1, cur->GetAdjacent(RIGHT));
-            if (cur->GetAdjacent(DOWN) != nullptr)
-                traverse(traverse, i + 1, j, cur->GetAdjacent(DOWN));
-            if (cur->GetAdjacent(LEFT) != nullptr)
-                traverse(traverse, i, j - 1, cur->GetAdjacent(LEFT));
-        };
-        traverse(traverse, N / 4, N >> 1, root);
-        for (int i = 0; i < N / 2; i++) {
-            for (int j = 0; j < N; j++)
-                cout << (vis[i][j] ? 'O' : '.');
-            cout << '\n';
-        }
-    }
 }

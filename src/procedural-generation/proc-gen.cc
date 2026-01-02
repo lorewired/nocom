@@ -1,8 +1,8 @@
 #include "proc-gen.hh"
 
-using namespace ProceduralGeneration;
+using namespace Game::ProceduralGeneration;
 
-void ProceduralGeneration::ConnectRooms(
+void Game::ProceduralGeneration::ConnectRooms(
     std::shared_ptr<MapNode> src,
     std::shared_ptr<MapNode> dst,
     NodeDir dir
@@ -28,7 +28,7 @@ void ProceduralGeneration::ConnectRooms(
     }
 }
 
-void ProceduralGeneration::SetEmptyCells(Map& map) {
+void Game::ProceduralGeneration::SetEmptyCells(Entities::Map& map) {
     const int height = map.Height();
     const int width = map.Width();
     const int totalBorderCells = (height << 1) + (width << 1);
@@ -64,8 +64,8 @@ void ProceduralGeneration::SetEmptyCells(Map& map) {
         min_y = std::min(min_y, j);
         max_y = std::max(max_y, j);
 
-        if (map.At(i, j).Type() != CellType::EMPTY) {
-            map.At(i, j).SetType(CellType::EMPTY);
+        if (map.At(i, j).Type() != Entities::CellType::EMPTY) {
+            map.At(i, j).SetType(Entities::CellType::EMPTY);
             emptyCells ++;
         }
 
@@ -88,7 +88,7 @@ void ProceduralGeneration::SetEmptyCells(Map& map) {
 
     const int new_height = max_x - min_x + 1;
     const int new_width  = max_y - min_y + 1;
-    Map new_map(new_width, new_height);
+    Entities::Map new_map(new_width, new_height);
 
     for (int i = 0; i < new_height; i++)
         for (int j = 0; j < new_width; j++)
@@ -97,7 +97,7 @@ void ProceduralGeneration::SetEmptyCells(Map& map) {
     map = new_map;
 }
 
-std::shared_ptr<MapNode> ProceduralGeneration::GenerateRooms(const int totalRooms) {
+std::shared_ptr<MapNode> Game::ProceduralGeneration::GenerateRooms(const int totalRooms) {
     std::vector<std::shared_ptr<MapNode>> rooms;
     int roomsCreated = 0;
     while (roomsCreated < totalRooms) {
@@ -125,10 +125,10 @@ std::shared_ptr<MapNode> ProceduralGeneration::GenerateRooms(const int totalRoom
     return rooms[r32ir(0, int(rooms.size() - 1))];
 }
 
-MapNode ProceduralGeneration::CreateMapNode() {
-    int height = r32ir(Map::MAP_MIN_HEIGHT, Map::MAP_MAX_HEIGHT);
-    int width  = r32ir(height, Map::MAP_MAX_WIDTH);
-    Map newMap = Map(width, height);
+MapNode Game::ProceduralGeneration::CreateMapNode() {
+    int height = r32ir(Entities::Map::MAP_MIN_HEIGHT, Entities::Map::MAP_MAX_HEIGHT);
+    int width  = r32ir(height, Entities::Map::MAP_MAX_WIDTH);
+    Entities::Map newMap = Entities::Map(width, height);
     SetEmptyCells(newMap);
     return MapNode(newMap);
 }
