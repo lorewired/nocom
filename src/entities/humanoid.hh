@@ -11,6 +11,7 @@ namespace Game::Entities {
     constexpr unsigned ENEMY_BASE_DAMAGE = 5;
 
     class Humanoid {
+    protected:
         std::string name;
 
         int hp = HUMANOID_BASE_HP;
@@ -19,19 +20,22 @@ namespace Game::Entities {
         Game::Utils::Vec2 coords;
         
     public:
+        Humanoid() = default;
+        ~Humanoid() = default;
+
         Humanoid(const std::string& _name);
-        Humanoid(const std::string& _name, const int& _damage);
+        Humanoid(const std::string& _name, int _damage);
 
         std::string Name() const;
         int Hp() const;
         int Damage() const;
 
         void SetName(const std::string& new_name);
-        void SetHp(const int& value);
-        void SetDamage(const int& value);
+        void SetHp(int value);
+        void SetDamage(int value);
 
-        void TakeDamage(const int& value);
-        void Heal(const int& value);
+        void TakeDamage(int value);
+        void Heal(int value);
         
         Game::Utils::Vec2 Coords() const;
         
@@ -40,8 +44,8 @@ namespace Game::Entities {
         int X() const;
         int Y() const;
 
-        void SetX(const int& new_x);
-        void SetY(const int& new_y);
+        void SetX(int new_x);
+        void SetY(int new_y);
     };
 
 }
