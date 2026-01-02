@@ -125,8 +125,17 @@ std::shared_ptr<MapNode> Game::ProceduralGeneration::GenerateRooms(const int tot
         rooms.push_back(newRoom);
         roomsCreated ++;
     }
-    // Pick a random room to be the root
-    return rooms[Game::Utils::r32ir(0, int(rooms.size() - 1))];
+    // Pick a random room to be the root and prepare the room
+    auto root = rooms[Game::Utils::r32ir(0, int(rooms.size() - 1))];
+    Game::Entities::Map& rootMap = root->GetMap();
+
+    // removing noise from initial room
+    for (int i = 1; i < rootMap.Height() - 1; i++)
+        for (int j = 1; j < rootMap.Width() - 1; j++)
+            if (rootMap.At(i, j).Type() != Game::Entities::CellType::EMPTY)
+            rootMap.At(i, j).SetType(Game::Entities::CellType::EMPTY);
+            
+    return root;
 }
 
 MapNode Game::ProceduralGeneration::CreateMapNode() {
