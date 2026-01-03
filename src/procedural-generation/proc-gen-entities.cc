@@ -19,24 +19,24 @@ if (other == nullptr) return;
     
     switch (dir) {
         case NodeDir::TOP:
-            for (int i = 1; i < map.Width() - 1; i++)
-                if (map.At(1, i).Type() == Game::Entities::CellType::EMPTY)
-                    cellsCoords.emplace_back(0, i);
+            for (int x = 1; x < map.Width() - 1; x++)
+                if (map.At(x, 1).Type() == Game::Entities::CellType::EMPTY)
+                    cellsCoords.emplace_back(x, 0);
             break;
         case NodeDir::RIGHT:
-            for (int i = 1; i < map.Height() - 1; i++)
-                if (map.At(i, map.Width() - 2).Type() == Game::Entities::CellType::EMPTY)
-                    cellsCoords.emplace_back(i, map.Width() - 1);
+            for (int y = 1; y < map.Height() - 1; y++)
+                if (map.At(map.Width() - 2, y).Type() == Game::Entities::CellType::EMPTY)
+                    cellsCoords.emplace_back(map.Width() - 1, y);
             break;
         case NodeDir::DOWN:
-            for (int i = 1; i < map.Width() - 1; i++)
-               if (map.At(map.Height() - 2, i).Type() == Game::Entities::CellType::EMPTY)
-                   cellsCoords.emplace_back(map.Height() - 1, i);
+            for (int x = 1; x < map.Width() - 1; x++)
+               if (map.At(x, map.Height() - 2).Type() == Game::Entities::CellType::EMPTY)
+                   cellsCoords.emplace_back(x, map.Height() - 1);
             break;
         case NodeDir::LEFT:
-            for (int i = 1; i < map.Height() - 1; i++)
-                if (map.At(i, 1).Type() == Game::Entities::CellType::EMPTY)
-                    cellsCoords.emplace_back(i, 0);
+            for (int y = 1; y < map.Height() - 1; y++)
+                if (map.At(1, y).Type() == Game::Entities::CellType::EMPTY)
+                    cellsCoords.emplace_back(0, y);
     }
 
     auto [randomX, randomY] = cellsCoords[Game::Utils::r32ir(0, cellsCoords.size() - 1)];

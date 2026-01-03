@@ -18,7 +18,7 @@ namespace Game::Entities {
         int damage = 0;
         
         Game::Utils::Vec2 coords;
-        
+
     public:
         Humanoid() = default;
         ~Humanoid() = default;
@@ -40,6 +40,7 @@ namespace Game::Entities {
         Game::Utils::Vec2 Coords() const;
         
         void SetCoords(const Game::Utils::Vec2& new_coords);
+        void SetCoords(int new_x, int new_y);
         
         int X() const;
         int Y() const;

@@ -45,6 +45,9 @@ int Game::Entities::Humanoid::Y() const { return coords.y; }
 void Game::Entities::Humanoid::SetCoords(const Game::Utils::Vec2& new_coords)
 { coords = new_coords; }
 
+void Game::Entities::Humanoid::SetCoords(int new_x, int new_y)
+{ coords = Game::Utils::Vec2(new_x, new_y); }
+
 void Game::Entities::Humanoid::SetX(int new_x) { coords.x = new_x; }
 
 void Game::Entities::Humanoid::SetY(int new_y) { coords.y = new_y; }

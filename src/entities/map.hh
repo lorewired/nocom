@@ -1,5 +1,7 @@
 #pragma once
 
+#include "src/utils/vec2.hh"
+
 #include <vector>
 #include <map>
 
@@ -59,6 +61,7 @@ namespace Game::Entities {
         int Height() const;
     
         Cell &At(int x, int y);
+        Cell &At(const Game::Utils::Vec2& coords);
         const std::vector<Cell> &Data() const;
     };
     

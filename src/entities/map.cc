@@ -21,7 +21,8 @@ Map::Map(int _width, int _height)
 int Map::Width() const { return width; }
 int Map::Height() const { return height; }
 
-Cell& Map::At(int x, int y) { return grid[x * width + y]; }
+Cell& Map::At(int x, int y) { return grid[y * width + x]; }
+Cell& Map::At(const Game::Utils::Vec2& coords) { return grid[coords.y * width + coords.x]; }
 
 const std::vector<Cell>& Map::Data() const { return grid; }
 
