@@ -2,3 +2,4 @@
 *.exe
 dungeon_gen
 todo.txt
+.vscode/
