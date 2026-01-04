@@ -1,4 +1,4 @@
-#include "keyboard.hh"
+#include "Keyboard.hh"
 
 bool Game::Core::Keyboard::IsKeyValid(const char key) { return key != '\0' && Game::Core::Keyboard::validKeys[key]; }
 

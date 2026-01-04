@@ -1,4 +1,4 @@
-#include "map.hh"
+#include "Map.hh"
 
 using namespace Game::Entities;
 
@@ -22,7 +22,7 @@ int Map::Width() const { return width; }
 int Map::Height() const { return height; }
 
 Cell& Map::At(int x, int y) { return grid[y * width + x]; }
-Cell& Map::At(const Game::Utils::Vec2& coords) { return grid[coords.y * width + coords.x]; }
+Cell& Map::At(const Game::Utils::Vec2<int, int>& coords) { return grid[coords.second * width + coords.first]; }
 
 const std::vector<Cell>& Map::Data() const { return grid; }
 

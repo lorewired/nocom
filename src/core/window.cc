@@ -1,4 +1,4 @@
-#include "window.hh"
+#include "Window.hh"
 
 Game::Core::Window::Window(std::shared_ptr<Game::ProceduralGeneration::MapNode> _initialRoom)
 : initialRoom(_initialRoom) {}
@@ -19,13 +19,12 @@ void Game::Core::Window::Render(std::shared_ptr<Game::ProceduralGeneration::MapN
     std::cout.flush();
 }
 
-void Game::Core::Window::RenderPlayer(const Game::Entities::Human& player) {
+void Game::Core::Window::RenderPlayer(Game::Entities::Human& player) {
     // TODO: move cursor and print player.
     Game::Terminal::PositionCursor(player.X(), player.Y());
     std::cout << "O";
     std::cout.flush();
 }
 
-void Game::Core::Window::FinishRender(const std::shared_ptr<Game::ProceduralGeneration::MapNode>& room) {
-    Game::Terminal::PositionCursor(0, room->GetMap().Height() + 1);
-}
+void Game::Core::Window::FinishRender(std::shared_ptr<Game::ProceduralGeneration::MapNode>& room)
+{ Game::Terminal::PositionCursor(0, room->GetMap().Height() + 1); }

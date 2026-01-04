@@ -2,15 +2,17 @@ CC      := g++
 CCFLAGS := -std=c++23 -w -g -I. -Isrc
 
 SRCS    := cmd/main.cc \
-           src/procedural-generation/proc-gen.cc \
-           src/procedural-generation/proc-gen-entities.cc \
-           src/entities/humanoid.cc \
-           src/entities/human.cc \
-           src/entities/map.cc \
-           src/core/runtime.cc \
-           src/core/keyboard.cc \
-           src/core/window.cc \
-           src/core/terminal.cc
+           src/procedural_generation/ProceduralGeneration.cc \
+           src/procedural_generation/ProceduralGenerationEntities.cc \
+           src/entities/Humanoid.cc \
+           src/entities/Human.cc \
+           src/entities/Map.cc \
+           src/core/Runtime.cc \
+           src/core/Keyboard.cc \
+           src/core/Window.cc \
+           src/core/Terminal.cc \
+           src/systems/events/Events.cc \
+
 
 OBJS    := $(SRCS:.cc=.o)
 

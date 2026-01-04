@@ -19,5 +19,6 @@ namespace Game::Utils {
         std::uniform_int_distribution<long long> distribution(l, r);
         return distribution(GetRandomGenerator());
     }
-    
+
 }
+ 

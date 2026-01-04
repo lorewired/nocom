@@ -1,0 +1,2 @@
+- limitar o inicio do drunkards's walk para não começar nas extremidades no mapa.
+- se quiser suavizar os ruídos gerados pelo drunkards.

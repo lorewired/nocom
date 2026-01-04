@@ -1,6 +1,6 @@
 #pragma once
 
-#include "src/utils/vec2.hh"
+#include "src/utils/Vec2.hh"
 
 #include <string>
 
@@ -17,7 +17,7 @@ namespace Game::Entities {
         int hp = HUMANOID_BASE_HP;
         int damage = 0;
         
-        Game::Utils::Vec2 coords;
+        Game::Utils::Vec2<int, int> coords;
 
     public:
         Humanoid() = default;
@@ -37,9 +37,9 @@ namespace Game::Entities {
         void TakeDamage(int value);
         void Heal(int value);
         
-        Game::Utils::Vec2 Coords() const;
+        Game::Utils::Vec2<int, int> Coords() const;
         
-        void SetCoords(const Game::Utils::Vec2& new_coords);
+        void SetCoords(const Game::Utils::Vec2<int, int>& new_coords);
         void SetCoords(int new_x, int new_y);
         
         int X() const;

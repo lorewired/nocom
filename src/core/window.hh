@@ -1,8 +1,8 @@
 #pragma once
 
-#include "src/procedural-generation/proc-gen.hh"
-#include "src/entities/human.hh"
-#include "terminal.hh"
+#include "src/procedural_generation/ProceduralGeneration.hh"
+#include "src/entities/Human.hh"
+#include "Terminal.hh"
 
 #include <memory>
 
@@ -16,9 +16,9 @@ namespace Game::Core {
         Window(std::shared_ptr<Game::ProceduralGeneration::MapNode> _initialRoom);
 
         void Render(std::shared_ptr<Game::ProceduralGeneration::MapNode> room);
-        void RenderPlayer(const Game::Entities::Human& player);
-        void FinishRender(const std::shared_ptr<Game::ProceduralGeneration::MapNode>& room);
+        void RenderPlayer(Game::Entities::Human& player);
+        void FinishRender(std::shared_ptr<Game::ProceduralGeneration::MapNode>& room);
         // void RenderEnemy(const Game::Entities::Enemy& enemy);
-};
+    };
 
 }

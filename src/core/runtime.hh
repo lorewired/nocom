@@ -1,23 +1,28 @@
 #pragma once
 
-#include "src/procedural-generation/proc-gen.hh"
-#include "src/entities/human.hh"
-#include "keyboard.hh"
-#include "window.hh"
+#include "src/procedural_generation/ProceduralGeneration.hh"
+#include "src/systems/events/Events.hh"
+#include "src/systems/GameContext.hh"
+#include "src/entities/Human.hh"
+#include "Keyboard.hh"
+#include "Window.hh"
 
 #include <thread>
 #include <chrono>
 #include <memory>
+
+#include <queue>
 
 namespace Game::Core {
 
     class Runtime {
         Game::Core::Window window;
 
-        Game::Entities::Human player;
+        Game::Systems::GameContext gameContext;
 
-        std::shared_ptr<Game::ProceduralGeneration::MapNode> initialRoom;
-        std::shared_ptr<Game::ProceduralGeneration::MapNode> currentRoom;
+        Game::Systems::Events::EventsHandler eventsHandler;
+        std::queue<Game::Systems::Events::EventContext> eventsPoll;
+        // TODO: for each eventHandleFunction implement the insertion into the events poll
         
     public:
         Runtime() = default;
@@ -27,9 +32,7 @@ namespace Game::Core {
         void HandlePlayerAction(const char input);
         void HandlePlayerMovement(const char dir);
 
-        void HandleEvents();
-
-        bool ValidCoords(const Game::Utils::Vec2& coords);
+        bool ValidCoords(const Game::Utils::Vec2<int, int>& coords);
         void Wait();
     };
 
