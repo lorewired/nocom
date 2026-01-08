@@ -1,4 +1,5 @@
 #include "ProceduralGeneration.hh"
+#include "src/utils/CardinalCoords.hh"
 
 using namespace Game::ProceduralGeneration;
 
@@ -28,13 +29,28 @@ void Game::ProceduralGeneration::ConnectRooms(
     }
 }
 
+void Game::ProceduralGeneration::PositionEnemies(MapNode& mapNode) {
+    Game::Entities::Map& map = mapNode.GetMap();
+    std::vector<Game::Utils::Vec2<int, int>> emptyCells;
+    for (int y = 0; y < map.Height(); y++) {
+        for (int x = 0; x < map.Width(); x++) {
+            if (map.At(x, y).Type() == Game::Entities::CellType::EMPTY) {
+                emptyCells.emplace_back(x, y);
+            }
+        }
+    }
+    int random_index = Game::Utils::r32ir(0, emptyCells.size() - 1);
+    Game::Utils::Vec2<int, int> random_coords = emptyCells[random_index];
+    auto enemy = std::make_shared<Game::Entities::Enemy>();
+    enemy->SetCoords(random_coords);
+    mapNode.Enemies().push_back(enemy);
+}
+
 void Game::ProceduralGeneration::SetEmptyCells(Entities::Map& map) {
     const int height           = map.Height();
     const int width            = map.Width();
     const int totalBorderCells = (height << 1) + (width << 1);
     const int totalEmptyArea   = height * width - totalBorderCells;
-    const int yCoords[]        = { -1, 0, 1, 0 };
-    const int xCoords[]        = { 0, 1, 0, -1 };
 
     auto valid = [&height, &width] (int x, int y) { return x > 0 && y > 0 && x < width - 1 && y < height - 1; };
     
@@ -52,7 +68,7 @@ void Game::ProceduralGeneration::SetEmptyCells(Entities::Map& map) {
 
     min_x = max_x = startX;
     min_y = max_y = startY;
-    
+
     while (stk.size()) {
         auto [x, y] = stk.top(); stk.pop();
 
@@ -71,8 +87,8 @@ void Game::ProceduralGeneration::SetEmptyCells(Entities::Map& map) {
 
         std::vector<std::pair<int, int>> validCoords;
         for (int i = 0; i < 4; i++) {
-            int Y = y + yCoords[i];
-            int X = x + xCoords[i];
+            int Y = y + Game::Utils::yCoords[i];
+            int X = x + Game::Utils::xCoords[i];
             if (valid(X, Y))
                 validCoords.emplace_back(X, Y);
         }
@@ -133,7 +149,7 @@ std::shared_ptr<MapNode> Game::ProceduralGeneration::GenerateRooms(const int tot
     for (int y = 1; y < rootMap.Height() - 1; y++)
         for (int x = 1; x < rootMap.Width() - 1; x++)
             if (rootMap.At(x, y).Type() != Game::Entities::CellType::EMPTY)
-            rootMap.At(x, y).SetType(Game::Entities::CellType::EMPTY);
+                rootMap.At(x, y).SetType(Game::Entities::CellType::EMPTY);
             
     return root;
 }
@@ -141,7 +157,8 @@ std::shared_ptr<MapNode> Game::ProceduralGeneration::GenerateRooms(const int tot
 MapNode Game::ProceduralGeneration::CreateMapNode() {
     int height = Game::Utils::r32ir(Entities::Map::MAP_MIN_HEIGHT, Entities::Map::MAP_MAX_HEIGHT);
     int width  = Game::Utils::r32ir(height, Entities::Map::MAP_MAX_WIDTH);
-    Entities::Map newMap = Entities::Map(width, height);
-    SetEmptyCells(newMap);
-    return MapNode(newMap);
+    MapNode mapNode(Entities::Map(width, height));
+    SetEmptyCells(mapNode.GetMap());
+    PositionEnemies(mapNode);
+    return mapNode;
 }

@@ -6,13 +6,17 @@ SRCS    := cmd/main.cc \
            src/procedural_generation/ProceduralGenerationEntities.cc \
            src/entities/Humanoid.cc \
            src/entities/Human.cc \
+           src/entities/Enemy.cc \
            src/entities/Map.cc \
            src/core/Runtime.cc \
            src/core/Keyboard.cc \
            src/core/Window.cc \
            src/core/Terminal.cc \
+           src/core/Snapshot.cc \
+           src/core/threads/AIThread.cc \
+           src/core/threads/ThreadManagement.cc \
            src/systems/events/Events.cc \
-
+           src/systems/events/EventsImpl.cc \
 
 OBJS    := $(SRCS:.cc=.o)
 

@@ -1,9 +1,7 @@
-#include <iostream>
-
-#include "src/core/runtime.hh"
+#include "src/core/Runtime.hh"
 
 int main(void) {
     Game::Core::Runtime runtime;
     runtime.RunGame();
-    return EXIT_SUCCESS;
+    return 0;
 }

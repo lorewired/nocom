@@ -1,31 +1,43 @@
 #include "runtime.hh"
 
 void Game::Core::Runtime::RunGame() {
-    auto initialRoom = gameContext.InitialRoom();
-    auto currentRoom = gameContext.CurrentRoom();
-    auto& player      = gameContext.Player();
+    auto generatedMap = Game::ProceduralGeneration::GenerateRooms(Game::Utils::r32ir(5, 10));
+    gameCtx.SetCurrentRoom(generatedMap);
 
-    initialRoom = currentRoom = Game::ProceduralGeneration::GenerateRooms(Game::Utils::r32ir(5, 10));
-    window      = Game::Core::Window(initialRoom);
-
-    player.SetCoords(initialRoom->GetMap().Width() >> 1, initialRoom->GetMap().Height() >> 1);
+    auto& player     = gameCtx.Player();
+    auto currentRoom = gameCtx.CurrentRoom();
+    
+    player.SetCoords(currentRoom->GetMap().Width() >> 1, currentRoom->GetMap().Height() >> 1);
+    
+    window = Game::Core::Window(currentRoom);
+    
+    auto lastRenderedRoom = gameCtx.CurrentRoom();
 
     Game::Terminal::HideCursor();
     Game::Terminal::CleanScreen();
+
+    // threadsManagement.RunAIThread(gameCtx);
     
     while (player.Hp() > 0) {
-        window.Render(currentRoom);
-        window.RenderPlayer(player);
-        window.FinishRender(currentRoom);
+        if (lastRenderedRoom != gameCtx.CurrentRoom()) {
+            Game::Terminal::CleanScreen();
+            lastRenderedRoom = gameCtx.CurrentRoom();
+        }
+        window.Render(gameCtx.CurrentRoom(), gameCtx.Player(), gameCtx.CurrentRoom()->Enemies());
+        // as duas funcoes abaixo estao protegidas por um mutex da pool
         HandlePlayerAction(Game::Core::Keyboard::ReadPlayerInput());
-        eventsHandler.LoadEvents(gameContext, eventsPoll);
+        eventsHandler.LoadEvents(gameCtx);
+        // essa de baixo por outro mutex q ntem nd haver com o de cima, q seria o mutex da snapshot
+        threadsManagement.UpdateSnapshot(gameCtx);
         Wait();
     }
+
+    // threadsManagement.StopAIThread();
 }
 
 void Game::Core::Runtime::HandlePlayerAction(const char input) {
     if (! Game::Core::Keyboard::IsKeyValid(input)) return;
-
+    
     if (std::isdigit(input)) {
         //
         return;
@@ -35,24 +47,15 @@ void Game::Core::Runtime::HandlePlayerAction(const char input) {
 }
 
 void Game::Core::Runtime::HandlePlayerMovement(const char dir) {
-    Game::Utils::Vec2<int, int> new_coords = gameContext.Player().Coords();
+    Game::Utils::Vec2<int, int> targetCoords = gameCtx.Player().Coords();
     switch (dir) {
-        case 'w': new_coords.second = gameContext.Player().Y() - 1; break;
-        case 'a': new_coords.first = gameContext.Player().X() - 1; break;
-        case 's': new_coords.second = gameContext.Player().Y() + 1; break;
-        case 'd': new_coords.first = gameContext.Player().X() + 1; break;
+        case 'w': targetCoords.second = gameCtx.Player().Y() - 1; break;
+        case 'a': targetCoords.first = gameCtx.Player().X() - 1; break;
+        case 's': targetCoords.second = gameCtx.Player().Y() + 1; break;
+        case 'd': targetCoords.first = gameCtx.Player().X() + 1; break;
     }
-    if (! ValidCoords(new_coords)) return;
-    gameContext.Player().SetCoords(new_coords);
+    if (! Game::Entities::Map::ValidCoords(gameCtx.CurrentRoom()->GetMap(), targetCoords)) return;
+    gameCtx.PushEvent<Game::Systems::Events::EventPlayerMove>(targetCoords);
 }
 
-bool Game::Core::Runtime::ValidCoords(const Game::Utils::Vec2<int, int>& new_coords)
-{
-    return new_coords.first >= 0 &&
-           new_coords.second >= 0 &&
-           new_coords.first < gameContext.CurrentRoom()->GetMap().Width() &&
-           new_coords.second < gameContext.CurrentRoom()->GetMap().Height() &&
-           gameContext.CurrentRoom()->GetMap().At(new_coords).Type() != Game::Entities::CellType::WALL;
-}
-
-void Game::Core::Runtime::Wait() { std::this_thread::sleep_for(std::chrono::milliseconds(30)); }
+void Game::Core::Runtime::Wait() { std::this_thread::sleep_for(std::chrono::milliseconds(50)); }

@@ -5,6 +5,9 @@
 #include "Terminal.hh"
 
 #include <memory>
+#include <sstream>
+#include <vector>
+#include <string>
 
 namespace Game::Core {
 
@@ -15,10 +18,11 @@ namespace Game::Core {
         Window() = default;
         Window(std::shared_ptr<Game::ProceduralGeneration::MapNode> _initialRoom);
 
-        void Render(std::shared_ptr<Game::ProceduralGeneration::MapNode> room);
-        void RenderPlayer(Game::Entities::Human& player);
-        void FinishRender(std::shared_ptr<Game::ProceduralGeneration::MapNode>& room);
-        // void RenderEnemy(const Game::Entities::Enemy& enemy);
+        void Render(
+            std::shared_ptr<Game::ProceduralGeneration::MapNode> room,
+            Game::Entities::Human& player,
+            std::vector<std::shared_ptr<Game::Entities::Enemy>>& enemies
+        );
     };
 
 }

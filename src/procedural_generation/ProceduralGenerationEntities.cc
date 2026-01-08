@@ -4,13 +4,15 @@ using namespace Game::ProceduralGeneration;
 
 #pragma region Map_Node_Area
 
-Game::Utils::Vec2<MapNode, Game::Utils::Vec2<int, int>> Game::ProceduralGeneration::MapNode::GetNextRoom(Game::Utils::Vec2<int, int> coords)
+Game::Utils::Vec2<std::shared_ptr<MapNode>, Game::Utils::Vec2<int, int>> Game::ProceduralGeneration::MapNode::GetNextRoom(
+    Game::Utils::Vec2<int, int> coords
+)
 {
     using namespace Game::Entities;
     using namespace Game::Utils;
 
     NodeDir dir =
-        coords.first    == map.Width() - 1 ? NodeDir::RIGHT
+        coords.first    == map.Width() - 1           ? NodeDir::RIGHT
         : coords.first  == 0                         ? NodeDir::LEFT
         : coords.second == 0                         ? NodeDir::UP
         :                                              NodeDir::DOWN;
@@ -41,16 +43,18 @@ Game::Utils::Vec2<MapNode, Game::Utils::Vec2<int, int>> Game::ProceduralGenerati
             doorCoords = findDoor(true, nextRoomMap.Width() - 1); 
             break;
         case NodeDir::UP:  
-            doorCoords = findDoor(false, 0); 
+            doorCoords = findDoor(false, nextRoomMap.Height() - 1); 
             break;
         case NodeDir::DOWN:
-            doorCoords = findDoor(false, nextRoomMap.Height() - 1); 
+            doorCoords = findDoor(false, 0); 
     }
     
-    return Vec2<MapNode, Vec2<int, int>>(*nextRoom, doorCoords);
+    return Vec2<std::shared_ptr<MapNode>, Vec2<int, int>>(nextRoom, doorCoords);
 }
 
 MapNode::MapNode(Entities::Map _map) : map(_map), number(++ID) {}
+
+std::vector<std::shared_ptr<Game::Entities::Enemy>>& Game::ProceduralGeneration::MapNode::Enemies() { return enemies; }
 
 Game::Entities::Map& MapNode::GetMap() { return map; }
 

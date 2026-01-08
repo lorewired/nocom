@@ -1,7 +1,8 @@
 #pragma once
 
-#include "src/utils/Rand.hh"
 #include "src/entities/Map.hh"
+#include "src/entities/Enemy.hh"
+#include "src/utils/Rand.hh"
 
 #include <vector>
 #include <stack>
@@ -26,19 +27,22 @@ namespace Game::ProceduralGeneration {
     class MapNode {
         Game::Entities::Map map;
         std::shared_ptr<MapNode> adjacents[4];
+        std::vector<std::shared_ptr<Game::Entities::Enemy>> enemies;
         int number;
 
     public:
         MapNode(Game::Entities::Map map);
 
-        Game::Entities::Map& GetMap();
         int Number() const;
-        
+        std::vector<std::shared_ptr<Game::Entities::Enemy>>& Enemies();
+        Game::Entities::Map& GetMap();
         std::shared_ptr<MapNode> GetAdjacent(NodeDir dir);
+        Game::Utils::Vec2<std::shared_ptr<MapNode>, Game::Utils::Vec2<int, int>> GetNextRoom(
+            Game::Utils::Vec2<int, int> coords
+        );
+
         void SetAdjacent(NodeDir dir, std::shared_ptr<MapNode> other);
         void SetEntrances(NodeDir dir, std::shared_ptr<MapNode> other);
-
-        Game::Utils::Vec2<MapNode, Game::Utils::Vec2<int, int>> GetNextRoom(Game::Utils::Vec2<int, int> coords);
         
         static NodeDir RandomNodeDirection();
     };
@@ -48,6 +52,7 @@ namespace Game::ProceduralGeneration {
     std::shared_ptr<MapNode> GenerateRooms(int total_rooms);
     void ConnectRooms(std::shared_ptr<MapNode> room1, std::shared_ptr<MapNode> room2, NodeDir dir);
     void SetEmptyCells(Game::Entities::Map& map);
+    void PositionEnemies(MapNode& mapNode);
     
     // debug
     inline void DebugMap(std::shared_ptr<MapNode> root) {

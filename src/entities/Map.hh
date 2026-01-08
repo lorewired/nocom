@@ -38,6 +38,7 @@ namespace Game::Entities {
     
     class Map {
         std::vector<Cell> grid;
+        std::vector<Game::Utils::Vec2<int, int>> emptyCells;
         int width;
         int height;
     
@@ -56,13 +57,17 @@ namespace Game::Entities {
             grid   = other.Data();
             return *this;
         }
+
+        static bool ValidCoords(Map& map, int targetX, int targetY);
+    static bool ValidCoords(Map& map, Game::Utils::Vec2<int, int> targetCoords);
     
         int Width() const;
         int Height() const;
     
         Cell &At(int x, int y);
         Cell &At(const Game::Utils::Vec2<int, int>& coords);
-        const std::vector<Cell> &Data() const;
+        const std::vector<Cell>& Data() const;
+        const std::vector<Game::Utils::Vec2<int, int>>& EmptyCells() const;
     };
     
 }
